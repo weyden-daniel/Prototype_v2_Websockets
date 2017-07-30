@@ -56,10 +56,31 @@
             }
          };
       </script>
+      
+      <title>Face Recognition Demonstration</title>
+
    </head>
-   <body>
-      <p>Open your browser's JavaScript console to see what's happening (hit F12).</p>
-      <button onclick='sendText();'>Send Text Message</button>
-      <button onclick='sendBinary();'>Send Binary Message</button>
-   </body>
+	
+	<body>
+		<table>
+			<tr>
+				<td>
+					<img src="static/opencv_python_logo.png">
+				</td>
+				<td>
+					<img src="static/oracle_logo.png">
+				</td> 		
+			</tr>
+		</table>
+    
+		<h1>Face Recognition Demonstration</h1>
+		<img id="bg" src="{{ url_for('video_feed') }}">
+		
+		<p>Open your browser's JavaScript console to see what's happening (hit F12).</p>
+		<button onclick='sendText();'>Send Text Message</button>
+		<button onclick='sendBinary();'>Send Binary Message</button>
+	</body>
 </html>
+
+
+
