@@ -101,13 +101,15 @@
 						 
 			function handleVideo(stream) {
 				video.src = window.URL.createObjectURL(stream);
-				var mediaStreamTrack = stream.getVideoTracks()[0];
-				var imageCapture = new ImageCapture(mediaStreamTrack);
-				imageCapture.grabFrame()
-				  .then(imageBitmap => {
-					  sendBinary(imageBitmap);
-				  })
-				  .catch(error => console.error('grabFrame() error:', error));				
+				
+				
+				//var mediaStreamTrack = stream.getVideoTracks()[0];
+				//var imageCapture = new ImageCapture(mediaStreamTrack);
+				//imageCapture.grabFrame()
+				//  .then(imageBitmap => {
+				//	  sendBinary(imageBitmap);
+				//  })
+				//  .catch(error => console.error('grabFrame() error:', error));				
 			}
 						 
 			function videoError(e){
