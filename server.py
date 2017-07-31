@@ -77,7 +77,7 @@ if __name__ == '__main__':
     
 	factory = WebSocketServerFactory(u"wss://140.86.39.208:9000")
     
-    factory.setProtocolOptions(
+	factory.setProtocolOptions(
 		allowedOrigins=["*"]
     )
     
