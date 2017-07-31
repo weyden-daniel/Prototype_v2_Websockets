@@ -2,62 +2,54 @@
 <html>
    <head>
       <script type="text/javascript">
-         var socket = null;
-         var isopen = false;
-
+         var sock = null;
+         var ellog = null;
          window.onload = function() {
-
-            socket = new WebSocket("ws://140.86.39.208:9000");
-            socket.binaryType = "arraybuffer";
-
-            socket.onopen = function() {
-               console.log("Connected!");
-               isopen = true;
+            var wsuri;
+            ellog = document.getElementById('log');
+            if (window.location.protocol === "file:") {
+               wsuri = "wss://localhost:9000";
+            } else {
+               wsuri = "wss://" + window.location.hostname + ":9000";
             }
-
-            socket.onmessage = function(e) {
-               if (typeof e.data == "string") {
-                  console.log("Text message received: " + e.data);
-               } else {
-                  var arr = new Uint8Array(e.data);
-                  var hex = '';
-                  for (var i = 0; i < arr.length; i++) {
-                     hex += ('00' + arr[i].toString(16)).substr(-2);
-                  }
-                  console.log("Binary message received: " + hex);
+            if ("WebSocket" in window) {
+               sock = new WebSocket(wsuri);
+            } else if ("MozWebSocket" in window) {
+               sock = new MozWebSocket(wsuri);
+            } else {
+               log("Browser does not support WebSocket!");
+            }
+            if (sock) {
+               sock.onopen = function() {
+                  log("Connected to " + wsuri);
+               }
+               
+               sock.onclose = function(e) {
+                  log("Connection closed (wasClean = " + e.wasClean + ", code = " + e.code + ", reason = '" + e.reason + "')");
+               }
+               sock.onmessage = function(e) {
+                  log("Got echo: " + e.data);
                }
             }
-
-            socket.onclose = function(e) {
-               console.log("Connection closed.");
-               socket = null;
-               isopen = false;
-            }
          };
-
-         function sendText() {
-            if (isopen) {
-               socket.send("Hello, world!");
-               console.log("Text message sent.");               
+         function send() {
+            var msg = document.getElementById('message').value;
+            var batchsize = parseInt(document.getElementById('batch').value);
+            if (sock) {
+               for (var i = 0; i < batchsize; ++i) {
+                  sock.send(msg);
+               }
+               log("Sent " + batchsize + "x : " + msg);
             } else {
-               console.log("Connection not opened.")
+               log("Not connected.");
             }
          };
-
-         function sendBinary(imageBitmap) {
-            if (isopen) {               
-               var arr = new Uint8Array(imageBitmap);
-               for (i = 0; i < arr.length; ++i) arr[i] = i;
-               socket.send(buf);
-               console.log("Binary message sent.");
-            } else {
-               console.log("Connection not opened.")
-            }
+         
+         function log(m) {
+            document.getElementById('log').innerHTML += m + '\n';
          };
-                 
-    	
-	</script>
-      
+      </script>
+               
 		<style>
 			#container {
 				margin: 0px auto;
@@ -124,9 +116,27 @@
 			
 		</script>
 
+
+	  <h1>Autobahn Secure WebSocket Echo Test</h1>
+      <noscript>You must enable JavaScript</noscript>
+      <form>
+         <p>Message: <input id="message" type="text" size="50" maxlength="50" value="Hello, world!"></p>
+         <p>Batchsize:
+            <select id="batch">
+               <option value="1">1</option>
+               <option value="2">2</option>
+               <option value="4">4</option>
+               <option value="8">8</option>
+            </select>
+         </p>
+      </form>
+      <button onclick='send();'>Send Message</button>
+      <pre id="log" style="height: 20em; overflow-y: scroll; background-color: #faa;"></pre>
+      
+    
+      
+      
 		
-		<p>Open your browser's JavaScript console to see what's happening (hit F12).</p>
-		<button onclick='sendText();'>Send Text Message</button>		
 	</body>
 </html>
 

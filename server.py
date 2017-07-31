@@ -24,8 +24,17 @@
 #
 ###############################################################################
 
+import sys
+
+from twisted.internet import reactor, ssl
+from twisted.web.server import Site
+from twisted.web.static import File
+
+import txaio
+
 from autobahn.twisted.websocket import WebSocketServerProtocol, \
-    WebSocketServerFactory
+    WebSocketServerFactory, \
+    listenWS
 
 
 class MyServerProtocol(WebSocketServerProtocol):
@@ -51,18 +60,39 @@ class MyServerProtocol(WebSocketServerProtocol):
 
 if __name__ == '__main__':
 
-    import sys
+    #import sys
 
-    from twisted.python import log
-    from twisted.internet import reactor
+    #from twisted.python import log
+    #from twisted.internet import reactor
 
-    log.startLogging(sys.stdout)
+    #log.startLogging(sys.stdout)
 
-    factory = WebSocketServerFactory(u"ws://140.86.39.208:9000")
-    factory.protocol = MyServerProtocol
-    # factory.setProtocolOptions(maxConnections=2)
+	txaio.start_logging(level='debug')
+
+    #factory = WebSocketServerFactory(u"ws://140.86.39.208:9000")
+    
+    # SSL Server Context: load server key and certificate
+    # We use this for both WS and Web!
+    contextFactory = ssl.DefaultOpenSSLContextFactory('ssl_certs/server.key', 'ssl_certs/server.crt')
+    
+    factory = WebSocketServerFactory(u"wss://140.86.39.208:9000")
+    
+    #factory.protocol = MyServerProtocol
+    
+    #factory.setProtocolOptions(maxConnections=2)
 
     # note to self: if using putChild, the child must be bytes...
-
-    reactor.listenTCP(9000, factory)
+	
+	factory.protocol = MyServerProtocol
+	listenWS(factory, contextFactory)
+	
+	webdir = File(".")
+	webdir.contentTypes['.crt'] = 'application/x-x509-ca-cert'
+	web = Site(webdir)
+	
+    #reactor.listenTCP(9000, factory)
+    
+    reactor.listenSSL(8080, web, contextFactory)
+    
     reactor.run()
+
