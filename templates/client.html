@@ -44,10 +44,9 @@
             }
          };
 
-         function sendBinary() {
-            if (isopen) {
-               var buf = new ArrayBuffer(32);
-               var arr = new Uint8Array(buf);
+         function sendBinary(imageBitmap) {
+            if (isopen) {               
+               var arr = new Uint8Array(imageBitmap);
                for (i = 0; i < arr.length; ++i) arr[i] = i;
                socket.send(buf);
                console.log("Binary message sent.");
@@ -110,6 +109,13 @@
 						 
 			function handleVideo(stream) {
 				video.src = window.URL.createObjectURL(stream);
+				var mediaStreamTrack = stream.getVideoTracks()[0];
+				var imageCapture = new ImageCapture(mediaStreamTrack);
+				imageCapture.grabFrame()
+				  .then(imageBitmap => {
+					  sendBinary(imageBitmap);
+				  })
+				  .catch(error => console.error('grabFrame() error:', error));				
 			}
 						 
 			function videoError(e){
@@ -120,8 +126,7 @@
 
 		
 		<p>Open your browser's JavaScript console to see what's happening (hit F12).</p>
-		<button onclick='sendText();'>Send Text Message</button>
-		<button onclick='sendBinary();'>Send Binary Message</button>
+		<button onclick='sendText();'>Send Text Message</button>		
 	</body>
 </html>
 
