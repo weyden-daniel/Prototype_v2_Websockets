@@ -73,9 +73,9 @@ if __name__ == '__main__':
     
     # SSL Server Context: load server key and certificate
     # We use this for both WS and Web!
-    contextFactory = ssl.DefaultOpenSSLContextFactory('ssl_certs/server.key', 'ssl_certs/server.crt')
+	contextFactory = ssl.DefaultOpenSSLContextFactory('ssl_certs/server.key', 'ssl_certs/server.crt')
     
-    factory = WebSocketServerFactory(u"wss://140.86.39.208:9000")
+	factory = WebSocketServerFactory(u"wss://140.86.39.208:9000")
     
     #factory.protocol = MyServerProtocol
     
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 	
     #reactor.listenTCP(9000, factory)
     
-    reactor.listenSSL(8080, web, contextFactory)
+	reactor.listenSSL(8080, web, contextFactory)
     
-    reactor.run()
+	reactor.run()
 
